@@ -1,0 +1,2 @@
+mongo mybnb --eval 'db.listings.drop()'
+mongoimport --host localhost --port 27017 --db mybnb --collection listings --file /home/hamza/Downloads/vttp2023_batch3_paf_assessment_template_2023_07_16-10_58_04/vttp2023_batch3_paf_assessment/data/listings.json --jsonArray

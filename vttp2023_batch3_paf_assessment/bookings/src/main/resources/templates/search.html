@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<head>
+    <title>Search</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="/img/spring-boot.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/webjars/font-awesome/5.15.1/css/all.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/mdb.min.css" />
+    <link rel="stylesheet" href="/css/addons/datatables.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="grey lighten-3">
+
+
+
+
+
+<!-- Main layout -->
+<main class="py-5 mx-lg-5">
+
+    <div class="container-fluid mt-5">
+
+        <hr>
+        <div class="card mb-12 wow fadeIn">
+
+            <div class="card-header">
+                <h5 class="heading"><strong>Search our Accomodations</strong></h5>
+            </div>
+            <div class="card-body">
+                <br>
+                <div class="alert alert-danger" id="errorMessage" style="display: none">
+                </div>
+
+            </div>
+            <form style="padding: 30px" id="search" onsubmit="return search()">
+                <div class="form-group">
+                    <label for="country">Country:</label>
+                    <select required class="form-control" name="country" id="country" placeholder="Country Name">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="Accomodates">Accomodates:</label>
+                    <input required type="number" min="1" max="10" class="form-control" name="accomodates" id="accomodates" placeholder="Accomodates">
+                </div>
+
+                <div class="form-group">
+                    <label for="min">Min Price:</label>
+                    <input required type="number" min="1" max="10000" class="form-control" name="min" id="min" placeholder="Min Price">
+                </div>
+                <div class="form-group">
+                    <label for="max">Max Price:</label>
+                    <input required type="number" min="1" max="10000" class="form-control" name="max" id="max" placeholder="Max Price">
+                </div>
+                <input type="submit"  class="btn btn-primary" value="Submit" />
+            </form>
+
+        </div>
+    </div>
+</main>
+</body>
+
+<!--/.Footer-->
+
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/addons/datatables.min.js"></script>
+<script type="text/javascript" src="/js/popper.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/mdb.min.js"></script>
+
+<script type="text/javascript">
+    const errorElement = document.getElementById("errorMessage");
+    let selectedProduct = "";
+    $(document).ready(function() {
+        fetch(`/countries`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(async function(response) {
+                if (response.status != 200) {
+                    throw new Error("An error occured fetching data");
+                }
+                return response.json();
+            })
+            .then(data => {
+                for(let i=0;i<data.countries.length;i++) {
+                    $('#country').append(`<option value="${data.countries[i]}">
+                                       ${data.countries[i]}
+                                  </option>`);
+                }
+
+            })
+            .catch(error => {
+                // Handle any errors that occur during the API call
+                console.log('Error:', error.message);
+                errorElement.innerHTML = error.message;
+                errorElement.style.display = "block";
+            });
+
+        sessionStorage.clear();
+    })
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+
+    function search() {
+
+            for(let i=0;i<errorElement.length;i++) {
+                errorElement[i].innerHTML = "";
+                errorElement[i].style.display = "none";
+            }
+            sessionStorage.setItem("listing",`Listings for ${$("#country").val()}`);
+            sessionStorage.setItem("url",`/search?country=${$("#country").val()}&accomodates=${$("#accomodates").val()}&min=${$("#min").val()}&max=${$("#max").val()}`)
+            window.location.href="http://localhost:8080/home";
+            return false;
+    }
+
+
+</script>
+
+</html>
